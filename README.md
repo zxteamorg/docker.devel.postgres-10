@@ -1,8 +1,9 @@
-[![Docker Build Status](https://img.shields.io/docker/build/zxteamorg/devel.postgres-10?label=Build%20Status)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/builds)
-[![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/zxteamorg/devel.postgres-10?label=Image%20Size)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/tags)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/zxteamorg/devel.postgres-10?label=Build%20Status)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/builds)
+[![Docker Image Version](https://img.shields.io/docker/v/zxteamorg/devel.postgres-10?sort=date&label=Version)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/tags)
+[![Docker Image Size](https://img.shields.io/docker/image-size/zxteamorg/devel.postgres-10?label=Image%20Size)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/zxteamorg/devel.postgres-10?label=Pulls)](https://hub.docker.com/r/zxteamorg/devel.postgres-10)
-[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/zxteamorg/devel.postgres-10?sort=semver&label=Version)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/tags)
-[![Docker Image Info](https://images.microbadger.com/badges/image/zxteamorg/devel.postgres-10.svg)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/dockerfile)
+[![Docker Pulls](https://img.shields.io/docker/stars/zxteamorg/devel.postgres-10?label=Docker%20Stars)](https://hub.docker.com/r/zxteamorg/devel.postgres-10)
+[![Docker Automation](https://img.shields.io/docker/cloud/automated/zxteamorg/devel.postgres-10?label=Docker%20Automation)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/builds)
 
 # Postgres
 [PostgreSQL](https://www.postgresql.org/) is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance

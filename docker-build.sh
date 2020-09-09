@@ -31,64 +31,48 @@ fi
 
 # allow the container to be started with `--user`
 if [ "$(id -u)" = '0' ]; then
-	mkdir -p "$PGDATA"
-	chown -R postgres "$PGDATA"
-	chmod 700 "$PGDATA"
+	echo "Started as user 'root'."
+	mkdir -p /data /build/usr/share/postgresql.template
+	chown -R postgres /data /build/usr/share/postgresql.template
+	chmod 700 /data /build/usr/share/postgresql.template
 
-	mkdir -p /var/run/postgresql
-	chown -R postgres /var/run/postgresql
-	chmod 775 /var/run/postgresql
+	mkdir -p /run/postgresql /build/run/postgresql 
+	chown -R postgres /run/postgresql /build/run/postgresql
+	chmod 775 /run/postgresql /build/run/postgresql
 
-	# Create the transaction log directory before initdb is run (below) so the directory is owned by the correct user
-	if [ "$POSTGRES_INITDB_WALDIR" ]; then
-		mkdir -p "$POSTGRES_INITDB_WALDIR"
-		chown -R postgres "$POSTGRES_INITDB_WALDIR"
-		chmod 700 "$POSTGRES_INITDB_WALDIR"
-	fi
-
-	exec gosu postgres "$BASH_SOURCE"
+	echo "Restarting as user 'postgres'..."
+	exec su -c "$0" postgres -- "$@"
+else
+	echo "Started as user '$(id -u -n)'."
 fi
 
-mkdir -p "$PGDATA"
-chown -R "$(id -u)" "$PGDATA" 2>/dev/null || :
-chmod 700 "$PGDATA" 2>/dev/null || :
+mkdir -p /data
+chown -R "$(id -u)" /data 2>/dev/null
+chmod 700 /data 2>/dev/null
 
 # look specifically for PG_VERSION, as it is expected in the DB dir
-if [ ! -s "$PGDATA/PG_VERSION" ]; then
-	# "initdb" is particular about the current user existing in "/etc/passwd", so we use "nss_wrapper" to fake that if necessary
-	# see https://github.com/docker-library/postgres/pull/253, https://github.com/docker-library/postgres/issues/359, https://cwrap.org/nss_wrapper.html
-	if ! getent passwd "$(id -u)" &> /dev/null && [ -e /usr/lib/libnss_wrapper.so ]; then
-		export LD_PRELOAD='/usr/lib/libnss_wrapper.so'
-		export NSS_WRAPPER_PASSWD="$(mktemp)"
-		export NSS_WRAPPER_GROUP="$(mktemp)"
-		echo "postgres:x:$(id -u):$(id -g):PostgreSQL:$PGDATA:/bin/false" > "$NSS_WRAPPER_PASSWD"
-		echo "postgres:x:$(id -g):" > "$NSS_WRAPPER_GROUP"
-	fi
+if [ ! -s "/data/PG_VERSION" ]; then
 
-	if [ "$POSTGRES_INITDB_WALDIR" ]; then
-		export POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --waldir $POSTGRES_INITDB_WALDIR"
-	fi
-	initdb --username="postgres"
+	echo "Initialize database backend directory"
+	initdb -D /data --username="postgres"
 
-	# unset/cleanup "nss_wrapper" bits
-	if [ "${LD_PRELOAD:-}" = '/usr/lib/libnss_wrapper.so' ]; then
-		rm -f "$NSS_WRAPPER_PASSWD" "$NSS_WRAPPER_GROUP"
-		unset LD_PRELOAD NSS_WRAPPER_PASSWD NSS_WRAPPER_GROUP
-	fi
-
+	echo "Setup 'trust' for all hosts"
 	{
 		echo
 		echo "host all all all trust"
-	} >> "$PGDATA/pg_hba.conf"
+	} >> "/data/pg_hba.conf"
+
+	echo "Setup 'listen_addresses' to '0.0.0.0'"
+	echo "listen_addresses = '0.0.0.0'" >> /data/postgresql.conf
 
 	# internal start of server in order to allow set-up using psql-client
 	# does not listen on external TCP/IP and waits until start finishes
-	PGUSER=postgres pg_ctl -D "$PGDATA" -o "-c listen_addresses=''" -w start
+	PGUSER=postgres pg_ctl -D /data -o "-c listen_addresses=''" -w start
 
 	psql=( psql -v ON_ERROR_STOP=1 --username "postgres" --no-password )
 
-	echo "Create users: devuser devadmin"
 	for USER in devuser devadmin; do
+		echo "Create an user: ${USER}"
 		"${psql[@]}" --set user="$USER" -f <(echo "CREATE USER :user WITH LOGIN;")
 	done
 
@@ -98,12 +82,14 @@ if [ ! -s "$PGDATA/PG_VERSION" ]; then
 	EOSQL
 
 	echo "Grant admin privileges to: devadmin"
-	"${psql[@]}" --set user="$USER" -f <(echo "ALTER DATABASE devdb OWNER TO devadmin;")
+	"${psql[@]}" -f <(echo "ALTER DATABASE devdb OWNER TO devadmin;")
 
 	echo "Apply init SQL"
-	"${psql[@]}" --dbname "devdb" -f "/etc/docker-build.sql"
+	"${psql[@]}" --dbname "devdb" -f "/build-toolkit/docker-build.sql"
 
-	PGUSER=postgres pg_ctl -D "$PGDATA" -m fast -w stop
+	PGUSER=postgres pg_ctl -D /data -m fast -w stop
+
+	mv /data/* /build/usr/share/postgresql.template/
 
 	echo
 	echo 'PostgreSQL init process complete; ready for start up.'
