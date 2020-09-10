@@ -5,16 +5,27 @@
 [![Docker Pulls](https://img.shields.io/docker/stars/zxteamorg/devel.postgres-10?label=Docker%20Stars)](https://hub.docker.com/r/zxteamorg/devel.postgres-10)
 [![Docker Automation](https://img.shields.io/docker/cloud/automated/zxteamorg/devel.postgres-10?label=Docker%20Automation)](https://hub.docker.com/r/zxteamorg/devel.postgres-10/builds)
 
-# Postgres
+# Postgres 10
 [PostgreSQL](https://www.postgresql.org/) is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance
 
 # Image reason
 For development and testing purposes we need pre-setup Postgres server to automate development and auto-testing actvity. The container has pre-defined empty database (with flag table to ensure non-production case) and two users.
 
+# Spec
+
+## Environment variables
+No any variables
+
+## Expose ports
+* `tcp/5432` - Postgres listening endpoint
+
+## Volumes
+* `/data` - Hold Postgres'es data
+
 # Inside
 * PostgreSQL 10.14 Server
 * Database `devdb`
-* Flag table `devdb.publc.devflag`
+* Flag table `"public"."devflag"`
 * User `postgres` - superuser
 * User `devadmin` - owner of the database `devdb`
 * User `devuser` - regular user

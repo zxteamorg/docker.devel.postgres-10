@@ -15,4 +15,5 @@ RUN apk add --no-cache postgresql
 COPY --from=Builder /build/ /
 USER root
 VOLUME /data
+EXPOSE 5432
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
