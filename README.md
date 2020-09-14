@@ -49,4 +49,4 @@ No any variables
 # Support
 
 * Maintained by: [ZXTeam](https://zxteam.org)
-* Where to get help: [Telegram](https://t.me/zxteamorg)
+* Where to get help: [Telegram Channel](https://t.me/zxteamorg)
