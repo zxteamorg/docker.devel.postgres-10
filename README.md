@@ -31,7 +31,7 @@ No any variables
 
 * PostgreSQL 10.14 Server
 * Database `devdb`
-* Flag table `"public"."devflag"`
+* Flag table `"public"."emptytestflag"`
 * User `postgres` - superuser
 * User `devadmin` - owner of the database `devdb`
 * User `devuser` - regular user

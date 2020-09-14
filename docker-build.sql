@@ -1,2 +1,2 @@
-CREATE TABLE "devflag" (id INTEGER);
-INSERT INTO "devflag" (id) VALUES(1);
+CREATE TABLE "emptytestflag" (id INTEGER);
+INSERT INTO "emptytestflag" (id) VALUES(1);
